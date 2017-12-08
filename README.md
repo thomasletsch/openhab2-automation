@@ -3,7 +3,7 @@ Some example automation Rules for OpenHAB 2 build with JavaScript.
 
 Uses parts from https://github.com/lewie/openhab2-javascript
 
-Be aware that all this is in an experimental stage. Event the rule engine used is still experimental :-). 
+Be aware that all this is in an experimental stage. Even the rule engine used is still experimental :-). 
 
 ## Prerequisites
 This rule needs OpenHAB 2.0 and higher.
