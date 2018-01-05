@@ -60,6 +60,32 @@ If the groups do not exist, they get created on first startup.
 
 - HeatingLog: To protocol the times when heating is on for a room, we also use an additional number item which gets a "1" when heating is ON and a "0" when its off. If it does not exist, it gets created on first startup. To protocol the heating, this Group should be persisted.
 
+### Persistent Set Points
+
+If you have your own number items for temperature setpoints, you should save them into the mapdb and restore them on startup (`mapdb.persist`):
+
+    Strategies {
+            default = everyChange
+    }
+    
+    Items {
+        HeatingSetpoint* : strategy = everyChange, restoreOnStartup
+        Heating* : strategy = everyChange, restoreOnStartup
+    }
+ 
+### Persistent Heating Log
+
+If you want to have graphs about when the heating was on, you should persist the HeatingLog group(`rr4j.persist`):
+
+    Strategies {
+            everyMinute 	: "0 * * * * ?"
+            default = everyMinute
+    }
+    
+    Items {
+        HeatingLog* : strategy = everyMinute
+    }
+
 ### Example
 Groups: Rooms, Temperature, HeatingValve, HeatingSetpoint, HeatingLog, LivingRoom
 
@@ -78,5 +104,5 @@ The algorithm is still very simple:
 If the setpoint temperature is higher than the actual temperature, the heating valve is turned ON. If the setpoint temperature is lower than the heating is turned OFF.
 
 ### Known Problems
-On openhab 2.1.0 the heating rule gets errors on first startup (it doesn't find the `itemRegistry` etc.). It seems the script is running too early. 
+Sometimes the heating rule gets errors on first startup (it doesn't find the `itemRegistry` etc.). It seems the script is running too early. 
 If such errors occure, wait until the server is started totally and than just trigger the script again (by touch the file or edit a blank space in it)  

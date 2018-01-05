@@ -47,13 +47,13 @@ var createHeatingRule = function (roomConfig) {
             var setpointItem = itemRegistry.getItem(roomConfig.setpointItem.name);
             var setpointState = setpointItem.state;
             logger.info("Setpoint: " + setpointState);
-            if(isUninitialized(roomConfig.setpointItem.name)) {
+            if (isUninitialized(roomConfig.setpointItem.name)) {
                 logger.info("Setpoint for room " + roomName + " not defined => no heating!");
-            } else if(newTemperature < setpointState) {
+            } else if (newTemperature < setpointState) {
                 logger.info("Turning heating in room " + roomName + " ON");
                 sendCommand(itemRegistry.getItem(roomConfig.valveItem.name), "ON");
                 postUpdate(itemRegistry.getItem(roomConfig.logItem.name), 1);
-            } else if(newTemperature > setpointState) {
+            } else if (newTemperature > setpointState) {
                 logger.info("Turning heating in room " + roomName + " OFF");
                 sendCommand(itemRegistry.getItem(roomConfig.valveItem.name), "OFF");
                 postUpdate(itemRegistry.getItem(roomConfig.logItem.name), 0);
@@ -68,32 +68,32 @@ var createHeatingRule = function (roomConfig) {
 
 // Check if all needed groups are available and create them if missing.
 
-if(getItem(roomGroup) === null) {
+if (getItem(roomGroup) === null) {
     logger.info(roomGroup + " group does not exist - creating it.");
     logger.info("You have to create a group item for each of your room and put it into the " + roomGroup + " group.");
     roomGroup = new GroupItem(roomGroup);
     itemRegistry.add(roomGroup);
 }
-if(getItem(temperatureGroup) === null) {
+if (getItem(temperatureGroup) === null) {
     logger.info(temperatureGroup + " group does not exist - creating it.");
     logger.info("You have to put the temperature sensor for each room with heating into this group.");
     var createdGroup = new GroupItem(temperatureGroup);
     itemRegistry.add(createdGroup);
 }
-if(getItem(setpointGroup) === null) {
+if (getItem(setpointGroup) === null) {
     logger.info(setpointGroup + " group does not exist - creating it.");
     logger.info("You have to create a new Item with type number for each room with heating and put it into this room. " +
         "It will be the temperature setpoint to put the target temperature for this room.");
     var createdGroup = new GroupItem(setpointGroup);
     itemRegistry.add(createdGroup);
 }
-if(getItem(valveGroup) === null) {
+if (getItem(valveGroup) === null) {
     logger.info(valveGroup + " group does not exist - creating it.");
     logger.info("You have to put the valve for each room with heating into this group.");
     var createdGroup = new GroupItem(valveGroup);
     itemRegistry.add(createdGroup);
 }
-if(getItem(logGroup) === null) {
+if (getItem(logGroup) === null) {
     logger.info(logGroup + " group does not exist - creating it.");
     logger.info("To log heating ON and OFF times and chart them you have to put one item for each room with heating into this group.");
     var createdGroup = new GroupItem(logGroup);
@@ -107,7 +107,7 @@ logger.info("RoomGroup: " + roomGroupItem);
 var rooms = roomGroupItem.getMembers();
 logger.debug("RoomGroup Members: " + rooms);
 var roomsArray = rooms.toArray();
-for(var roomsIdx in roomsArray) {
+for (var roomsIdx in roomsArray) {
     var actualRoom = roomsArray[roomsIdx];
     logger.info("Room: " + actualRoom);
     var actualRoomItems = actualRoom.getMembers();
@@ -136,7 +136,7 @@ for(var roomsIdx in roomsArray) {
         logger.info("Room " + currentRoomConfig.roomItem.name + " has heating.");
         if (currentRoomConfig.setpointItem === undefined) {
             logger.info("Room " + currentRoomConfig.roomItem.name + " has no setpoint. Creating one...");
-            var item = new NumberItem("Heating_" + currentRoomConfig.roomItem.name + "Setpoint");
+            var item = new NumberItem(currentRoomConfig.roomItem.name + "_Heating_" + "Setpoint");
             item.addGroupName(currentRoomConfig.roomItem.name);
             item.addGroupName(setpointGroup);
             itemRegistry.add(item);
@@ -144,7 +144,7 @@ for(var roomsIdx in roomsArray) {
         }
         if (currentRoomConfig.logItem === undefined) {
             logger.info("Room " + currentRoomConfig.roomItem.name + " has no log item. Creating one...");
-            var item = new NumberItem("Heating_" + currentRoomConfig.roomItem.name + "Log");
+            var item = new NumberItem(currentRoomConfig.roomItem.name + "_Heating_" + "Log");
             item.addGroupName(currentRoomConfig.roomItem.name);
             item.addGroupName(logGroup);
             itemRegistry.add(item);
