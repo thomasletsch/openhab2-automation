@@ -6,42 +6,14 @@ Uses parts from https://github.com/lewie/openhab2-javascript
 Be aware that all this is in an experimental stage. Even the rule engine used is still experimental :-). 
 
 ## Prerequisites
-This rule needs OpenHAB 2.0 and higher.
+This rule needs OpenHAB 2.4 and higher.
 
 You have to enable the experimental rule engine (http://docs.openhab.org/configuration/rules-ng.html). 
 
-### Copy Lewie Libs
+### Lewie Libs
 We use our own copy from the JS libs from https://github.com/lewie/openhab2-javascript.
 Please copy all files under `src/jslib` into `openhab2/automation/jsr223/jslib`. 
 Create directories if needed. Adjust the `mainPath` entries as needed.
-
-## Roller Shutter Control
-This scripts lets you create a rule for controlling a roller shutter with a switch.
-
-### Ease of use
-To use it, copy the `lib/rollershutterControl.js` to your openhab installation into `openhab2/automation/jsr223/lib`. 
-
-To activate the rule for a switch and shutter, create a `.js` file with the following content:
-    
-    'use strict';
-    
-    se.importPreset("RuleSupport");
-    se.importPreset("RuleSimple");
-    se.importPreset("RuleFactories");
-    
-    var mainPath = '/etc/openhab2/automation/jsr223/';
-    
-    load(mainPath + 'lib/rollerShutterControl.js');
-    
-    logger.info("Starting rule RollerShutterRule");
-    
-    createSwitchRollershutterControl("KitchenUG_Blinds_Switch", "KitchenUG_Blinds", "KitchenUG_Blinds_Working");
-    
-This example will set up a rule to control the `KitchenUG_Blinds` with the switch `KitchenUG_Blinds_Switch`. The working item name is optional. See next chapter for details.
-Adjust the `mainPath` to the path of your `jsr223` directory.
-
-### Working Support
-E.g. the homematic roller shutter can signal when they are still "working". This script supports this setting and can stop the roller shutter when a button is pressed and the roller shutter is still working (running).
 
 ## Underfloor Heating Control
 This script is an automatic heating control system for underfloor heating valves. 
@@ -102,6 +74,34 @@ The rule for each room gets triggered on Temperature item change and on HeatingS
 The algorithm is still very simple:
 
 If the setpoint temperature is higher than the actual temperature, the heating valve is turned ON. If the setpoint temperature is lower than the heating is turned OFF.
+
+## Roller Shutter Control
+This scripts lets you create a rule for controlling a roller shutter with a switch.
+
+### Ease of use
+To use it, copy the `lib/rollershutterControl.js` to your openhab installation into `openhab2/automation/jsr223/lib`. 
+
+To activate the rule for a switch and shutter, create a `.js` file with the following content:
+    
+    'use strict';
+    
+    se.importPreset("RuleSupport");
+    se.importPreset("RuleSimple");
+    se.importPreset("RuleFactories");
+    
+    var mainPath = '/etc/openhab2/automation/jsr223/';
+    
+    load(mainPath + 'lib/rollerShutterControl.js');
+    
+    logger.info("Starting rule RollerShutterRule");
+    
+    createSwitchRollerShutterControl("KitchenUG_Blinds_Switch", "KitchenUG_Blinds", "KitchenUG_Blinds_Working");
+    
+This example will set up a rule to control the `KitchenUG_Blinds` with the switch `KitchenUG_Blinds_Switch`. The working item name is optional. See next chapter for details.
+Adjust the `mainPath` to the path of your `jsr223` directory.
+
+### Working Support
+E.g. the homematic roller shutter can signal when they are still "working". This script supports this setting and can stop the roller shutter when a button is pressed and the roller shutter is still working (running).
 
 ### Known Problems
 Sometimes the heating rule gets errors on first startup (it doesn't find the `itemRegistry` etc.). It seems the script is running too early. 

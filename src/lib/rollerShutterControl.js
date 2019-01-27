@@ -8,7 +8,7 @@ load(mainPath + 'jslib/triggersAndConditions.js');
 
 logger.info("Loading rollerShutterControl library");
 
-var createSwitchRollershutterControl = function (switchItemName, rollerShutterItemName, workingItemName) {
+var createSwitchRollerShutterControl = function (switchItemName, rollerShutterItemName, workingItemName) {
     logger.info("Creating roller shutter control rule for " + rollerShutterItemName + " with switch " + switchItemName + " and working " + workingItemName);
     JSRule({
         uid: "RollerShutterRule_" + switchItemName,

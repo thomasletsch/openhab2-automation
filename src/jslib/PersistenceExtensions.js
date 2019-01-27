@@ -1,14 +1,20 @@
+/**
+ * Copyright (c) 2018 by Helmut Lehmeyer.
+ *
+ * @author Helmut Lehmeyer
+ */
+
 'use strict';
 
 var PersistenceExtensions	= Java.type("org.eclipse.smarthome.model.persistence.extensions.PersistenceExtensions");
 
 //Simplifies spelling for rules.
 (function(context) {
-  'use strict';
-  
+	'use strict';
+
 	context.PersistenceExtensions 	= PersistenceExtensions;
 	context.pe 						= PersistenceExtensions;
-	
+
 	context.persistExt = function(type, it, serviceId) {
 		try {
 			//var item = context.getItem(it);
@@ -19,7 +25,7 @@ var PersistenceExtensions	= Java.type("org.eclipse.smarthome.model.persistence.e
 		}
 		return null;
 	};
-	
+
 	//void persist(Item item, String serviceId)
 	//void persist(Item item)
 	context.persist = function(it, serviceId) {
@@ -164,5 +170,5 @@ var PersistenceExtensions	= Java.type("org.eclipse.smarthome.model.persistence.e
 		}
 		return null;
 	};
-  
+
 })(this);

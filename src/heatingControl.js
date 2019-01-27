@@ -4,11 +4,11 @@ se.importPreset("RuleSupport");
 se.importPreset("RuleSimple");
 se.importPreset("RuleFactories");
 
-var mainPath = '/etc/openhab2/automation/jsr223/';
+var OPENHAB_CONF = Java.type("java.lang.System").getenv("OPENHAB_CONF");
 
-load(mainPath + 'jslib/helper.js');
-load(mainPath + 'jslib/JSRule.js');
-load(mainPath + 'jslib/triggersAndConditions.js');
+load(OPENHAB_CONF + '/automation/jsr223/jslib/helper.js');
+load(OPENHAB_CONF + '/automation/jsr223/jslib/JSRule.js');
+load(OPENHAB_CONF + '/automation/jsr223/jslib/triggersAndConditions.js');
 
 var NumberItem = Java.type("org.eclipse.smarthome.core.library.items.NumberItem");
 var GroupItem = Java.type("org.eclipse.smarthome.core.items.GroupItem");
@@ -22,9 +22,6 @@ var setpointGroup = "HeatingSetpoint";
 var valveGroup = "HeatingValve";
 var logGroup = "HeatingLog";
 
-/**
- * The single rule which gets created for each room with heating.
- */
 var createHeatingRule = function (roomConfig) {
     logger.debug('Room Config:' + JSON.stringify(currentRoomConfig));
     var roomName = roomConfig.roomItem.name;
@@ -38,35 +35,41 @@ var createHeatingRule = function (roomConfig) {
         name: "HeatingRule_" + roomName,
         description: "Control the Heating in room " + roomName + " with the temperature sensor " + temperatureItemName,
         execute: function (module, input) {
-            logger.info("Executing HeatingRule");
+            logger.debug("Executing HeatingRule");
             logger.debug("Get item " + roomConfig.temperatureItem.name);
             var temperatureItem = itemRegistry.getItem(roomConfig.temperatureItem.name);
-            logger.info("Temperature item " + temperatureItem);
+            logger.debug("Temperature item " + temperatureItem);
             var newTemperature = temperatureItem.state;
-            logger.info("newTemperature: " + newTemperature);
+            logger.debug("newTemperature: " + newTemperature);
             var setpointItem = itemRegistry.getItem(roomConfig.setpointItem.name);
             var setpointState = setpointItem.state;
-            logger.info("Setpoint: " + setpointState);
+            var valveItem = itemRegistry.getItem(roomConfig.valveItem.name);
+            var valveState = false;
+            if (!isUninitialized(valveItem)) {
+                valveState = (
+                    (valveItem !== null) &&
+                    !(valveItem.state instanceof UnDefType) &&
+                    (valveItem.state.toString() === "ON"));
+            }
+            logger.debug("Setpoint: " + setpointState);
             if (isUninitialized(roomConfig.setpointItem.name)) {
                 logger.info("Setpoint for room " + roomName + " not defined => no heating!");
-            } else if (newTemperature < setpointState) {
+            } else if (newTemperature < setpointState && !valveState) {
                 logger.info("Turning heating in room " + roomName + " ON");
-                sendCommand(itemRegistry.getItem(roomConfig.valveItem.name), "ON");
+                sendCommand(valveItem, "ON");
                 postUpdate(itemRegistry.getItem(roomConfig.logItem.name), 1);
-            } else if (newTemperature > setpointState) {
+            } else if (newTemperature > setpointState && valveState) {
                 logger.info("Turning heating in room " + roomName + " OFF");
-                sendCommand(itemRegistry.getItem(roomConfig.valveItem.name), "OFF");
+                sendCommand(valveItem, "OFF");
                 postUpdate(itemRegistry.getItem(roomConfig.logItem.name), 0);
             }
         },
         triggers: [
-            new ChangedEventTrigger(temperatureItemName, null, null, "Updated" + temperatureItemName),
-            new ChangedEventTrigger(roomConfig.setpointItem.name, null, null, "Updated" + roomConfig.setpointItem.name)
+            new UpdatedEventTrigger(temperatureItemName, null, "Updated" + temperatureItemName),
+            new UpdatedEventTrigger(roomConfig.setpointItem.name, null, "Updated" + roomConfig.setpointItem.name)
         ]
     });
 };
-
-// Check if all needed groups are available and create them if missing.
 
 if (getItem(roomGroup) === null) {
     logger.info(roomGroup + " group does not exist - creating it.");
@@ -99,9 +102,6 @@ if (getItem(logGroup) === null) {
     var createdGroup = new GroupItem(logGroup);
     itemRegistry.add(createdGroup);
 }
-
-// Check all entries in the Rooms group if they contain a temperature and heating valve and therefore a base heating system.
-
 var roomGroupItem = itemRegistry.getItem(roomGroup);
 logger.info("RoomGroup: " + roomGroupItem);
 var rooms = roomGroupItem.getMembers();
